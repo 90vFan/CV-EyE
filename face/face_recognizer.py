@@ -112,10 +112,10 @@ def draw_face_rect(frame, face_locations, pred_face_names):
         # left *= 4
 
         # draw a box around face
-        cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 1)
+        cv2.rectangle(frame, (left-10, top-10), (right+10, bottom+10), (0, 255, 0), 1)
 
         font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame, name, (left + 6, bottom + 16), font, 0.45, (255, 255, 0), 1)
+        cv2.putText(frame, name, (left, bottom + 26), font, 0.45, (255, 153, 51), 1)
         # print('Detect face: ' + name)
 
 

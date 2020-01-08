@@ -1,5 +1,7 @@
 # Face Recognition
 
+![bigbangall_face.png](./bigbangall_face.png)
+
 ```sh
 python3 face_recognizer.py -h
 usage: face_recognizer.py [-h] [-d DATASET] [-i IMAGE] [-v VIDEO]

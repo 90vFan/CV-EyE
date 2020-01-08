@@ -7,6 +7,7 @@ from imutils import paths
 import imutils
 import PIL
 import pickle
+import re
 
 
 ap = argparse.ArgumentParser()
@@ -14,7 +15,7 @@ ap.add_argument('-d', '--dataset', required=False,
                 help='directory of image dataset with human faces')
 ap.add_argument('-i', '--image', required=False,
                 help='input image for face recognization')
-ap.add_argument('-v', '--video', required=False, default=0,
+ap.add_argument('-v', '--video', required=False,
                 help='input video file, or camera interface (default: 0) for recognization')
 ap.add_argument('-r', '--recognizer', required=False,
                 help='model to recognize face')
@@ -55,7 +56,7 @@ if arg_recognizer:
 # ======================================
 # predict face name
 # ======================================
-def predict_face_name_by_images(dataset_names, dataset_embeddings, face_encodings):
+def predict_face_name_by_compare(dataset_names, dataset_embeddings, face_encodings):
     pred_face_names = []
     for face_encoding in face_encodings:
         matches = face_recognition.compare_faces(dataset_embeddings, face_encoding)
@@ -85,7 +86,7 @@ def predict_face_name_by_images(dataset_names, dataset_embeddings, face_encoding
     return pred_face_names
 
 
-def predict_face_name_by_recognizer(recognizer_names, recognizer_model, face_encodings):
+def predict_face_name_by_model(recognizer_names, recognizer_model, face_encodings):
     pred_face_names = []
     if not face_encodings:
         return pred_face_names
@@ -119,6 +120,10 @@ def draw_face_rect(frame, face_locations, pred_face_names):
 
 
 def video_recognizer():
+    arg_video = args['video']
+    if re.search(r'^\d*$', args['video']):
+        arg_video = int(arg_video)
+
     cap = cv2.VideoCapture(arg_video)
 
     while True:
@@ -134,9 +139,9 @@ def video_recognizer():
         face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
 
         if arg_dataset:
-            pred_face_names = predict_face_name_by_images(dataset_names, dataset_embeddings, face_encodings)
+            pred_face_names = predict_face_name_by_compare(dataset_names, dataset_embeddings, face_encodings)
         elif arg_recognizer:
-            pred_face_names = predict_face_name_by_recognizer(
+            pred_face_names = predict_face_name_by_model(
                 recognizer_names, recognizer_model, face_encodings)
 
         draw_face_rect(frame, face_locations, pred_face_names)
@@ -156,9 +161,9 @@ def image_recognizer():
     face_encodings = face_recognition.face_encodings(rgb_image, face_locations)
 
     if arg_dataset:
-        pred_face_names = predict_face_name_by_images(dataset_names, dataset_embeddings, face_encodings)
+        pred_face_names = predict_face_name_by_compare(dataset_names, dataset_embeddings, face_encodings)
     elif arg_recognizer:
-        pred_face_names = predict_face_name_by_recognizer(
+        pred_face_names = predict_face_name_by_model(
             recognizer_names, recognizer_model, face_encodings)
 
     draw_face_rect(image, face_locations, pred_face_names)
